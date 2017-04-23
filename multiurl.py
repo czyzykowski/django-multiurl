@@ -61,9 +61,14 @@ class MultiResolverMatch(object):
 
     @property
     def func(self):
-        def multiview(request):
+        def multiview(request, *args, **kwargs):
             for i, match in enumerate(self.matches):
                 try:
+                    largs = list(args)
+                    largs.extend(list(match.args))
+                    match.args = tuple(largs)
+
+                    match.kwargs.update(kwargs)
                     return match.func(request, *match.args, **match.kwargs)
                 except self.exceptions:
                     continue
